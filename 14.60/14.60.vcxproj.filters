@@ -30,6 +30,9 @@
     <ClInclude Include="ue.h">
       <Filter>Hassium\Public</Filter>
     </ClInclude>
+    <ClInclude Include="log.h">
+      <Filter>Hassium\Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

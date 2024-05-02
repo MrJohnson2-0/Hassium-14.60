@@ -1,4 +1,5 @@
 #include "ue.h"
+#include "log.h"
 
 DWORD Main(LPVOID)
 {
@@ -7,17 +8,12 @@ DWORD Main(LPVOID)
         AllocConsole();
         FILE* sFile;
         freopen_s(&sFile, "CONOUT$", "w", stdout);
-        SetConsoleTitleA("Hassium 14.60 || Loading Funcs...");
-        std::cout << "BaseAddr: {}" + GetBaseAddr();
-        if (GetEngine == UFortEngine::GetDefaultObj)
-        {
-            std::cout << "FortEngine_0 is Default Object of class UFortEngine";
-        }
-        else {
-            std::cout << "UFortEngine DefaultObject: ";
-        }
+        InitGObjects();
+        MH_Initialize();
+        
+        LOG("BaseAddr: 0x{}" + GetBaseAddr());
     }
-    GetKKSL()->ExecuteConsoleCommand(GetWorld(), L"open Apollo_Terrain", nullptr);
+    //GetEngine()->GameInstance->LocalPlayers[0]->PlayerController->SwitchLevel(L"Apollo_Terrain");
     return 0;
 }
 

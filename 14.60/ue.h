@@ -4,10 +4,12 @@
 #include <vector>
 #include "Includes/SDK/SDK.hpp"
 using namespace SDK;
+#include "Includes/minhook/MinHook.h"
+#pragma comment(lib, "Includes/minhook/minhook.lib")
 
 UFortEngine* GetEngine()
 {
-	auto Engine = UObject::FindObject<UFortEngine>("FortEngine_0");
+	auto Engine = UObject::FindObject<UFortEngine>("FortEngine_");
 	return Engine;
 }
 UWorld* GetWorld()
@@ -18,7 +20,7 @@ UWorld* GetWorld()
 
 uintptr_t GetBaseAddr()
 {
-	auto BaseAddr = __int64(GetModuleHandleA(0));
+	__int64 BaseAddr = __int64(GetModuleHandleW(0));
 	return BaseAddr;
 }
 
