@@ -7,6 +7,12 @@ using namespace SDK;
 #include "Includes/minhook/MinHook.h"
 #pragma comment(lib, "Includes/minhook/minhook.lib")
 
+void HookFunction(uintptr_t Address, LPVOID Detour, LPVOID* OG)
+{
+	MH_CreateHook((LPVOID)Address, Detour, (void**)&OG);
+	MH_EnableHook((LPVOID)Address);
+}
+
 UFortEngine* GetEngine()
 {
 	static auto Engine = UObject::FindObject<UFortEngine>("FortEngine_");

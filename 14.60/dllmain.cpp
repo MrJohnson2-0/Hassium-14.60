@@ -13,7 +13,7 @@ DWORD Main(LPVOID)
     MH_Initialize();
     InitGObjects();
     UKismetSystemLibrary::GetDefaultObj()->ExecuteConsoleCommand(UWorld::GetWorld(), L"open Apollo_Terrain", nullptr);
-
+    
     return 0;
 }
 
