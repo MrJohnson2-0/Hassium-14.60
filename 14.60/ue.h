@@ -9,13 +9,12 @@ using namespace SDK;
 
 UFortEngine* GetEngine()
 {
-	auto Engine = UObject::FindObject<UFortEngine>("FortEngine_");
+	static auto Engine = UObject::FindObject<UFortEngine>("FortEngine_");
 	return Engine;
 }
 UWorld* GetWorld()
 {
-	auto World = GetEngine()->GameViewport->World;
-	return World;
+	return GetEngine()->GameViewport->World;
 }
 
 uintptr_t GetBaseAddr()

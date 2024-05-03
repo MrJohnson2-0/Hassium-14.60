@@ -8,12 +8,12 @@ DWORD Main(LPVOID)
         AllocConsole();
         FILE* sFile;
         freopen_s(&sFile, "CONOUT$", "w", stdout);
-        InitGObjects();
-        MH_Initialize();
-        
-        LOG("BaseAddr: 0x{}" + GetBaseAddr());
+        SetConsoleTitleA("Hassium 14.60 || Loading Funcs....");
     }
-    //GetEngine()->GameInstance->LocalPlayers[0]->PlayerController->SwitchLevel(L"Apollo_Terrain");
+    MH_Initialize();
+    InitGObjects();
+    UKismetSystemLibrary::GetDefaultObj()->ExecuteConsoleCommand(UWorld::GetWorld(), L"open Apollo_Terrain", nullptr);
+
     return 0;
 }
 
