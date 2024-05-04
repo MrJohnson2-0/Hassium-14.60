@@ -141,7 +141,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="hook.h" />
+    <ClInclude Include="listen.h" />
     <ClInclude Include="log.h" />
+    <ClInclude Include="memory.h" />
     <ClInclude Include="ue.h" />
     <ClInclude Include="Includes\SDK\SDK.hpp" />
   </ItemGroup>

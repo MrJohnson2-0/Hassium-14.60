@@ -1,5 +1,7 @@
 #include "ue.h"
+#include "memory.h"
 #include "log.h"
+#include "listen.h"
 #include "hook.h"
 
 DWORD Main(LPVOID)
@@ -14,7 +16,9 @@ DWORD Main(LPVOID)
     MH_Initialize();
     InitGObjects();
     UKismetSystemLibrary::GetDefaultObj()->ExecuteConsoleCommand(UWorld::GetWorld(), L"open Apollo_Terrain", nullptr);
-    HookAddress(Offsets::ProcessEvent, Hooking::ProcessEvent_Hook, (void**)&Hooking::ProcessEvent0);
+
+    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch), Hooking::ReadyToStartMatchHook, (void**)&Hooking::ReadyToStartMatchOriginal);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch));
 
     return 0;
 }

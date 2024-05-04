@@ -4432,6 +4432,27 @@ public:
 	uint8                                        Pad_1A2C[0xA8];                                    // Fixing Size After Last Property  [ Dumper-7 ]
 	enum class EFastArraySerializerDeltaFlags    DeltaFlags;                                        // 0x100(0x1)(ZeroConstructor, Transient, IsPlainOldData, RepSkip, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPrivate)
 	uint8                                        Pad_1A2D[0x7];                                     // Fixing Size Of Struct [ Dumper-7 ]
+
+	int32 CachedNumItems;
+	int32 CachedNumItemsToConsiderForWriting;
+
+	void MarkArrayDirty()
+	{
+
+		IncrementArrayReplicationKey();
+
+		CachedNumItems = -1;
+		CachedNumItemsToConsiderForWriting = -1;
+	}
+
+	void IncrementArrayReplicationKey()
+	{
+		ArrayReplicationKey++;
+		if (ArrayReplicationKey == -1)
+		{
+			ArrayReplicationKey++;
+		}
+	}
 };
 
 // 0x10 (0x10 - 0x0)

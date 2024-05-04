@@ -29,7 +29,9 @@ namespace Offsets
 	constexpr int32 GNames            = 0x00000000;
 	constexpr int32 ProcessEvent      = 0x0376B220;
 	constexpr int32 ProcessEventIdx   = 0x00000043;
-	constexpr int32 ReadyToStartMatch = 0x0;
+	constexpr int32 ReadyToStartMatch = 0x51B4580;
+	constexpr int32 ReadyToEndMatch   = 0x51B4530;
+
 }
 
 #include "PropertyFixup.hpp"

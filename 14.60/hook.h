@@ -9,10 +9,39 @@ namespace Hooking {
 	{
 		return true;
 	}
-	void(*ReadyToStartMatchOriginal)(AFortGameModeBase* GMB);
-	void ReadyToStartMatchHook(AFortGameModeBase* GMB)
+	bool(*ReadyToStartMatchOriginal)(AFortGameModeAthena* GameMode);
+	bool ReadyToStartMatchHook(AFortGameModeAthena* GameMode)
 	{
+		static bool bReadyToStartMatchHook = false;
+		if (bReadyToStartMatchHook)
+			return false;
+		std::cout << "ReadyToStartMatchCalled";
+		bReadyToStartMatchHook = true;
+		static bool bInit = false;
+		if (!bInit)
+		{
+			bInit = true;
+			UFortPlaylistAthena* Playlist = UObject::FindObjectFast<UFortPlaylistAthena>("Playlist_DefaultSolo.Playlist_DefaultSolo");
+			GetGameState()->CurrentPlaylistInfo.BasePlaylist = Playlist;
+			GetGameState()->CurrentPlaylistInfo.OverridePlaylist = Playlist;
+			GetGameState()->CurrentPlaylistInfo.PlaylistReplicationKey++;
+			GetGameState()->CurrentPlaylistInfo.MarkArrayDirty();
+			GetGameState()->CurrentPlaylistId = Playlist->PlaylistId;
+			GetGameMode()->CurrentPlaylistName = Playlist->PlaylistName;
+			GetGameMode()->CurrentPlaylistId = Playlist->PlaylistId;
+			GetGameState()->OnRep_CurrentPlaylistInfo();
+			GetGameState()->OnRep_CurrentPlaylistId();
 
+			static bool Listening = false;
+			if (!Listening)
+			{
+				Listening::Listen();
+				Listening = true;
+
+			}
+
+		}
+		return ReadyToStartMatchOriginal(GameMode);
 	}
 	void (*ProcessEvent0)(UObject* Obj, UFunction* UEFunction, void* Params);
 	void ProcessEvent_Hook(UObject* Obj, UFunction* UEFunction, void* Params)

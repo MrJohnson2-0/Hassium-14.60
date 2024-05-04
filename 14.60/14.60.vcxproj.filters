@@ -36,6 +36,12 @@
     <ClInclude Include="hook.h">
       <Filter>Hassium\Public</Filter>
     </ClInclude>
+    <ClInclude Include="listen.h">
+      <Filter>Hassium\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="memory.h">
+      <Filter>Hassium\Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
