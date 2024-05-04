@@ -45,7 +45,7 @@ public:
 			if (!Object)
 				continue;
 			
-			if (Object->HasTypeFlag(RequiredType) && Object->GetFullName() == FullName)
+			if (Object->HasTypeFlag(RequiredType) && Object->GetFullName().contains(FullName))
 			{
 				return static_cast<UEType*>(Object);
 			}
@@ -53,6 +53,8 @@ public:
 
 		return nullptr;
 	}
+
+	 
 
 
 	template<typename UEType = UObject>
@@ -65,7 +67,7 @@ public:
 			if (!Object)
 				continue;
 			
-			if (Object->HasTypeFlag(RequiredType) && Object->GetName() == Name)
+			if (Object->HasTypeFlag(RequiredType) && Object->GetName().contains(Name))
 			{
 				return static_cast<UEType*>(Object);
 			}

@@ -21,16 +21,12 @@ namespace Hooking {
 		if (!bInit)
 		{
 			bInit = true;
-			UFortPlaylistAthena* Playlist = UObject::FindObjectFast<UFortPlaylistAthena>("Playlist_DefaultSolo.Playlist_DefaultSolo");
+			UFortPlaylistAthena* Playlist = UObject::FindObject<UFortPlaylistAthena>("FortPlaylistAthena /Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo");
 			GetGameState()->CurrentPlaylistInfo.BasePlaylist = Playlist;
 			GetGameState()->CurrentPlaylistInfo.OverridePlaylist = Playlist;
 			GetGameState()->CurrentPlaylistInfo.PlaylistReplicationKey++;
 			GetGameState()->CurrentPlaylistInfo.MarkArrayDirty();
-			GetGameState()->CurrentPlaylistId = Playlist->PlaylistId;
-			GetGameMode()->CurrentPlaylistName = Playlist->PlaylistName;
-			GetGameMode()->CurrentPlaylistId = Playlist->PlaylistId;
 			GetGameState()->OnRep_CurrentPlaylistInfo();
-			GetGameState()->OnRep_CurrentPlaylistId();
 
 			static bool Listening = false;
 			if (!Listening)
