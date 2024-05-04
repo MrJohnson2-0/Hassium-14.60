@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="hook.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="ue.h" />
     <ClInclude Include="Includes\SDK\SDK.hpp" />

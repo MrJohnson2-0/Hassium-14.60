@@ -1,9 +1,10 @@
 #include "ue.h"
 #include "log.h"
+#include "hook.h"
 
 DWORD Main(LPVOID)
 {
-    if (Debugging)
+    if (bDebugging)
     {
         AllocConsole();
         FILE* sFile;
@@ -13,7 +14,8 @@ DWORD Main(LPVOID)
     MH_Initialize();
     InitGObjects();
     UKismetSystemLibrary::GetDefaultObj()->ExecuteConsoleCommand(UWorld::GetWorld(), L"open Apollo_Terrain", nullptr);
-    
+    HookAddress(Offsets::ProcessEvent, Hooking::ProcessEvent_Hook, (void**)&Hooking::ProcessEvent0);
+
     return 0;
 }
 

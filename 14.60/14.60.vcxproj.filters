@@ -33,6 +33,9 @@
     <ClInclude Include="log.h">
       <Filter>Hassium\Public</Filter>
     </ClInclude>
+    <ClInclude Include="hook.h">
+      <Filter>Hassium\Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
