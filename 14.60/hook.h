@@ -57,6 +57,13 @@ namespace Hooking {
 	bool(*ReadyToStartMatchOriginal)(AFortGameModeAthena* GameMode);
 	bool ReadyToStartMatchHook(AFortGameModeAthena* GameMode)
 	{
+		UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(GetWorld(), AFortPlayerStartWarmup::StaticClass(), &ActorsToFree); //Freeing PlayerStartActors
+		int Num = ActorsToFree.Num();
+		ActorsToFree.Free();
+		if (Num == 0) //No Actors Will need to be free! 
+		{
+			return false;
+		}
 		static bool bReadyToStartMatchHook = false;
 		if (bReadyToStartMatchHook)
 			return false;

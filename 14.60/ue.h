@@ -16,7 +16,7 @@ void HookAddress(uintptr_t Address, LPVOID Detour, LPVOID* OG = nullptr)
 	MH_EnableHook((LPVOID)Address);
 }
 
-
+TArray<AActor*> ActorsToFree;
 
 UFortEngine* GetEngine()
 {
