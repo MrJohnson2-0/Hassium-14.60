@@ -4,7 +4,7 @@ namespace Listening
 {
 	bool (*InitListen)(UNetDriver* NetDriver, void* InNotify, FURL& ListenURL, bool bReUseAddressAndPort, FString& Error); // https://docs.unrealengine.com/4.27/en-US/API/Runtime/Engine/Engine/UNetDriver/InitListen/
 	void (*SetWorld)(UNetDriver* NetDriver,UWorld* World); // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/UNetDriver/SetWorld/
-	int32 (*ServerReplicateActors)(float DeltaSeconds); // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/UNetDriver/ServerReplicateActors/
+	int32 (*ServerReplicateActors)(void*); // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/UNetDriver/ServerReplicateActors/
 	bool (*InitHost)(AOnlineBeacon* Beacon); // https://docs.unrealengine.com/4.26/en-US/API/Plugins/OnlineSubsystemUtils/AOnlineBeaconHost/InitHost/
 	void (*PauseBeaconRequests)(AOnlineBeacon* Beacon, bool bPause); // https://docs.unrealengine.com/4.27/en-US/API/Plugins/OnlineSubsystemUtils/AOnlineBeacon/PauseBeaconRequests/
 	void Listen()

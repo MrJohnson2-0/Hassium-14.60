@@ -13,10 +13,13 @@ DWORD Main(LPVOID)
         freopen_s(&sFile, "CONOUT$", "w", stdout);
         SetConsoleTitleA("Hassium 14.60 || Loading Funcs....");
     }
+    FFree = decltype(FFree)(Memory::MergeOffset(Offsets::Free));
+
     MH_Initialize();
     InitGObjects();
     UKismetSystemLibrary::GetDefaultObj()->ExecuteConsoleCommand(UWorld::GetWorld(), L"open Apollo_Terrain", nullptr);
     GetEngine()->GameInstance->LocalPlayers.Remove(0);
+    
     
 
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch), Hooking::ReadyToStartMatchHook, (void**)&Hooking::ReadyToStartMatchOriginal);
@@ -30,6 +33,9 @@ DWORD Main(LPVOID)
 
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::CollectGarbage), Hooking::Patch4, nullptr);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::CollectGarbage));
+
+    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::TickFlush), Hooking::TickFlushHook, (void**)&Hooking::TickFlushOriginal);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::TickFlush));
 
     return 0;
 }

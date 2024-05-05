@@ -17,6 +17,19 @@ namespace Hooking {
 	{
 		return;
 	}
+
+	void (*TickFlushOriginal)(UNetDriver* NetDriver, float DeltaSeconds);
+	void TickFlushHook(UNetDriver* NetDriver, float DeltaSeconds)
+	{
+		if (NetDriver && NetDriver->ClientConnections.Num() > 0 && NetDriver->ClientConnections[0]->InternalAck)
+		{
+			void** ReplicationDriverVFT = *(void***)GetWorld()->NetDriver->ReplicationDriver;
+			Listening::ServerReplicateActors = decltype(Listening::ServerReplicateActors)(ReplicationDriverVFT[0x5E]);
+			Listening::ServerReplicateActors(NetDriver->ReplicationDriver);
+		}
+		return TickFlushOriginal(NetDriver, DeltaSeconds);
+	}
+
 	bool(*ReadyToStartMatchOriginal)(AFortGameModeAthena* GameMode);
 	bool ReadyToStartMatchHook(AFortGameModeAthena* GameMode)
 	{
@@ -40,6 +53,19 @@ namespace Hooking {
 			if (!Listening)
 			{
 				Listening::Listen();
+				GetGameMode()->GameSession = SpawnActor<AFortGameSession>({}, nullptr);
+				GetGameMode()->GameSession->MaxPlayers = 100;
+				GetGameState()->GameSessionId = L"ID";
+				GetGameState()->OnRep_GameSessionID();
+				GetGameMode()->StartMatch();
+				GetGameMode()->StartPlay();
+				EAthenaGamePhase Gamephase = GetGameState()->GamePhase;
+				GetGameState()->GamePhase = EAthenaGamePhase::Warmup;
+				GetGameState()->OnRep_GamePhase(Gamephase);
+				GetGameMode()->WarmupRequiredPlayerCount = 2;
+				GetGameMode()->WarmupEarlyCountdownDuration = 150.0f;
+				GetGameState()->WarmupCountdownStartTime = 150.0f;
+				GetGameState()->WarmupCountdownEndTime = 150.0f;
 				Listening = true;
 
 			}
@@ -50,6 +76,7 @@ namespace Hooking {
 
 	APawn* SpawnDefaultPawnFor(AGameModeBase* GameMode, AController* NewPlayer, AActor* StartSpot)
 	{
+		std::cout << "SpawnDefaultPawnFor";
 		if (NewPlayer && StartSpot)
 		{
 			auto Transform = StartSpot->GetTransform();

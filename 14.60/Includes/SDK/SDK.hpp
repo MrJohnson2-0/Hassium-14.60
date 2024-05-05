@@ -36,6 +36,8 @@ namespace Offsets
 	constexpr int32 GetNetMode = 0x5139DE0;
 	constexpr int32 ActorGetNetMode = 0x4A3FAA0;
 	constexpr int32 CollectGarbage = 0x36E1E30;
+	constexpr int32 Free = 0x345DEC0;
+	constexpr int32 TickFlush = 0x4e3fea0;
 }
 
 #include "PropertyFixup.hpp"
