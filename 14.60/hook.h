@@ -1,5 +1,17 @@
 #pragma once
 
+namespace Enums
+{
+	enum ENetMode // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/ENetMode/ Documentation of All Enums!
+	{
+		NM_Standalone,
+		NM_DedicatedServer,
+		NM_ListenServer,
+		NM_Client,
+		NM_MAX,
+	};
+}
+
 namespace Hooking {
 	int Patch()
 	{
@@ -18,11 +30,23 @@ namespace Hooking {
 		return;
 	}
 
+	
+
+	Enums::ENetMode GetNetMode() { // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/GameFramework/AActor/GetNetMode/ AActorGetNetMode
+		return Enums::ENetMode::NM_DedicatedServer;
+	}
+
+	Enums::ENetMode GetNetModeActor() // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/UWorld/GetNetMode/ UWorldGetNetMode
+	{
+		return Enums::ENetMode::NM_DedicatedServer;
+	}
+
 	void (*TickFlushOriginal)(UNetDriver* NetDriver, float DeltaSeconds);
-	void TickFlushHook(UNetDriver* NetDriver, float DeltaSeconds)
+	void TickFlushHook(UNetDriver* NetDriver, float DeltaSeconds) // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/UNetDriver/TickFlush/
 	{
 		if (NetDriver && NetDriver->ClientConnections.Num() > 0 && NetDriver->ClientConnections[0]->InternalAck)
 		{
+			// ServerReplicateActors https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/UNetDriver/ServerReplicateActors/
 			void** ReplicationDriverVFT = *(void***)GetWorld()->NetDriver->ReplicationDriver;
 			Listening::ServerReplicateActors = decltype(Listening::ServerReplicateActors)(ReplicationDriverVFT[0x5E]);
 			Listening::ServerReplicateActors(NetDriver->ReplicationDriver);

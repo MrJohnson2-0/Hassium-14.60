@@ -20,14 +20,6 @@ DWORD Main(LPVOID)
     UKismetSystemLibrary::GetDefaultObj()->ExecuteConsoleCommand(UWorld::GetWorld(), L"open Apollo_Terrain", nullptr);
     GetEngine()->GameInstance->LocalPlayers.Remove(0);
     
-    
-
-    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch), Hooking::ReadyToStartMatchHook, (void**)&Hooking::ReadyToStartMatchOriginal);
-    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch));
-
-    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor), Hooking::SpawnDefaultPawnFor, nullptr);
-    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor));
-
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::KickPlayer), Hooking::Patch3, nullptr);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::KickPlayer));
 
@@ -36,6 +28,20 @@ DWORD Main(LPVOID)
 
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::TickFlush), Hooking::TickFlushHook, (void**)&Hooking::TickFlushOriginal);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::TickFlush));
+    
+    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::GetNetMode), Hooking::GetNetMode, nullptr);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::GetNetMode));
+    
+    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ActorGetNetMode), Hooking::GetNetModeActor, nullptr);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ActorGetNetMode));
+
+    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch), Hooking::ReadyToStartMatchHook, (void**)&Hooking::ReadyToStartMatchOriginal);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch));
+
+    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor), Hooking::SpawnDefaultPawnFor, nullptr);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor));
+
+    
 
     return 0;
 }
