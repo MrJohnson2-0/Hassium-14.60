@@ -16,9 +16,20 @@ DWORD Main(LPVOID)
     MH_Initialize();
     InitGObjects();
     UKismetSystemLibrary::GetDefaultObj()->ExecuteConsoleCommand(UWorld::GetWorld(), L"open Apollo_Terrain", nullptr);
+    GetEngine()->GameInstance->LocalPlayers.Remove(0);
+    
 
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch), Hooking::ReadyToStartMatchHook, (void**)&Hooking::ReadyToStartMatchOriginal);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch));
+
+    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor), Hooking::SpawnDefaultPawnFor, nullptr);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor));
+
+    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::KickPlayer), Hooking::Patch3, nullptr);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::KickPlayer));
+
+    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::CollectGarbage), Hooking::Patch4, nullptr);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::CollectGarbage));
 
     return 0;
 }

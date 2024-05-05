@@ -9,6 +9,14 @@ namespace Hooking {
 	{
 		return true;
 	}
+	char Patch3()
+	{
+		return 1;
+	}
+	void Patch4()
+	{
+		return;
+	}
 	bool(*ReadyToStartMatchOriginal)(AFortGameModeAthena* GameMode);
 	bool ReadyToStartMatchHook(AFortGameModeAthena* GameMode)
 	{
@@ -39,6 +47,19 @@ namespace Hooking {
 		}
 		return ReadyToStartMatchOriginal(GameMode);
 	}
+
+	APawn* SpawnDefaultPawnFor(AGameModeBase* GameMode, AController* NewPlayer, AActor* StartSpot)
+	{
+		if (NewPlayer && StartSpot)
+		{
+			auto Transform = StartSpot->GetTransform();
+
+			return GameMode->SpawnDefaultPawnAtTransform(NewPlayer, Transform);
+		}
+
+		return 0;
+	}
+
 	void (*ProcessEvent0)(UObject* Obj, UFunction* UEFunction, void* Params);
 	void ProcessEvent_Hook(UObject* Obj, UFunction* UEFunction, void* Params)
 	{

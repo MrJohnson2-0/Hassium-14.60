@@ -31,7 +31,11 @@ namespace Offsets
 	constexpr int32 ProcessEventIdx   = 0x00000043;
 	constexpr int32 ReadyToStartMatch = 0x51B4580;
 	constexpr int32 ReadyToEndMatch   = 0x51B4530;
-
+	constexpr int32 SpawnDefaultPawnFor = 0x2079A10;
+	constexpr int32 KickPlayer = 0x4CDE3C0;
+	constexpr int32 GetNetMode = 0x5139DE0;
+	constexpr int32 ActorGetNetMode = 0x4A3FAA0;
+	constexpr int32 CollectGarbage = 0x36E1E30;
 }
 
 #include "PropertyFixup.hpp"

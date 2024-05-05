@@ -68,6 +68,8 @@ public:
 	}
 };
 
+static void* (*FMemory_Realloc)(void*, __int64, unsigned int);
+static void* (*FFree)(void* Original);
 template<class T>
 class TArray
 {
@@ -125,6 +127,40 @@ public:
 	inline void ResetNum()
 	{
 		NumElements = 0;
+	}
+
+	inline T& Add(T& InputData)
+	{
+		Data = (T*)realloc(Data, sizeof(T) * (NumElements + 1));
+		Data[NumElements++] = InputData;
+		MaxElements++;
+
+		return Data[NumElements - 1];
+	};
+
+	inline void Free() {
+		if (Data && FFree) {
+			FFree((void*)Data);
+		}
+		Data = nullptr;
+
+		NumElements = 0;
+		MaxElements = 0;
+	}
+
+	inline bool Remove(int Index)
+	{
+		if (Index < NumElements)
+		{
+			if (Index != NumElements - 1)
+			{
+				Data[Index] = Data[NumElements - 1];
+			}
+
+			NumElements -= 1;
+			return true;
+		}
+		return false;
 	}
 };
 
