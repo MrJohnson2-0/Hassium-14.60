@@ -117,6 +117,21 @@ namespace Hooking {
 		Controller->AcknowledgedPawn = P;
 	}
 
+	void (*HandleStartingNewPlayerOriginal)(AGameModeBase* Base, AFortPlayerControllerAthena* NewPlayer);
+	void HandleStartingNewPlayer(AGameModeBase* Base, AFortPlayerControllerAthena* NewPlayer)
+	{
+		std::cout << "Join!!!!!!";
+
+		auto PS = reinterpret_cast<AFortPlayerStateAthena*>(NewPlayer->PlayerState);
+		NewPlayer->bHasServerFinishedLoading = true;
+		NewPlayer->OnRep_bHasServerFinishedLoading();
+
+		PS->bHasStartedPlaying = true;
+		PS->OnRep_bHasStartedPlaying();
+
+		return HandleStartingNewPlayerOriginal(Base, NewPlayer);
+	}
+
 	void (*ProcessEvent0)(UObject* Obj, UFunction* UEFunction, void* Params);
 	void ProcessEvent_Hook(UObject* Obj, UFunction* UEFunction, void* Params)
 	{
