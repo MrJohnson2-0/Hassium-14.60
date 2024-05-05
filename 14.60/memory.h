@@ -14,10 +14,10 @@ namespace Memory
 		return Offset;
 	}
 
-	template<class T>
-	T* VirtualHook(uintptr_t Index, LPVOID Detour, void** OG = nullptr)
+	
+	void VirtualHook(void** VFT,int Index, void* Detour, void** OG = nullptr)
 	{
-		auto VFT = T::GetDefaultObject()->VFT;
+		
 
 		if (OG)
 			*OG = VFT[Index];
@@ -30,7 +30,7 @@ namespace Memory
 		VirtualProtect(&VFT[Index], 8, DWORDT, &DWORD2);
 	}
 
-	void HookFunction(UFunction* Func, LPVOID Detour, void** OG = nullptr)
+	void HookFunction(UFunction* Func, void* Detour, void** OG = nullptr)
 	{
 		auto& Function = Func->ExecFunction;
 

@@ -32,11 +32,11 @@ namespace Hooking {
 
 	
 
-	Enums::ENetMode GetNetMode() { // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/GameFramework/AActor/GetNetMode/ AActorGetNetMode
+	Enums::ENetMode GetNetMode() { // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/UWorld/GetNetMode/ UWorldGetNetMode
 		return Enums::ENetMode::NM_DedicatedServer;
 	}
 
-	Enums::ENetMode GetNetModeActor() // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/UWorld/GetNetMode/ UWorldGetNetMode
+	Enums::ENetMode GetNetModeActor() // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/GameFramework/AActor/GetNetMode/
 	{
 		return Enums::ENetMode::NM_DedicatedServer;
 	}
@@ -86,7 +86,7 @@ namespace Hooking {
 				EAthenaGamePhase Gamephase = GetGameState()->GamePhase;
 				GetGameState()->GamePhase = EAthenaGamePhase::Warmup;
 				GetGameState()->OnRep_GamePhase(Gamephase);
-				GetGameMode()->WarmupRequiredPlayerCount = 2;
+				GetGameMode()->WarmupRequiredPlayerCount = 1;
 				GetGameMode()->WarmupEarlyCountdownDuration = 150.0f;
 				GetGameState()->WarmupCountdownStartTime = 150.0f;
 				GetGameState()->WarmupCountdownEndTime = 150.0f;
@@ -109,6 +109,12 @@ namespace Hooking {
 		}
 
 		return 0;
+	}
+
+	void ServerAcknowledgePossesion(APlayerController* Controller, APawn* P) 
+	{
+		std::cout << "ServerAcknowledgePossesion";
+		Controller->AcknowledgedPawn = P;
 	}
 
 	void (*ProcessEvent0)(UObject* Obj, UFunction* UEFunction, void* Params);
