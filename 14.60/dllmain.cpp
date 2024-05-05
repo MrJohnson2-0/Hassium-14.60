@@ -36,6 +36,9 @@ DWORD Main(LPVOID)
     //MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ActorGetNetMode), Hooking::GetNetModeActor, nullptr);
     //MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ActorGetNetMode));
 
+    MH_CreateHook((LPVOID)Memory::MergeOffset(0x2653520), Hooking::ChangeGameSessionIdHook, nullptr);
+    MH_EnableHook((LPVOID)Memory::MergeOffset(0x2653520));
+
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch), Hooking::ReadyToStartMatchHook, (void**)&Hooking::ReadyToStartMatchOriginal);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch));
 
@@ -44,8 +47,8 @@ DWORD Main(LPVOID)
     
     Memory::VirtualHook(&AFortPlayerPawnAthena::GetDefaultObj()->Vft, 0x100, Hooking::ServerAcknowledgePossesion, nullptr);
 
-    static auto HandleStartingNewPlayer = UObject::FindObject<UFunction>("/Script.Enigne.GameModeBase.HandleStartingNewPlayer");
-    Memory::HookFunction(HandleStartingNewPlayer, Hooking::HandleStartingNewPlayer, (void**)&Hooking::HandleStartingNewPlayerOriginal);
+    //static auto HandleStartingNewPlayer = UObject::FindObject<UFunction>("/Script.Enigne.GameModeBase.HandleStartingNewPlayer");
+    //Memory::HookFunction(HandleStartingNewPlayer, Hooking::HandleStartingNewPlayer, (void**)&Hooking::HandleStartingNewPlayerOriginal);
 
     return 0;
 }

@@ -132,6 +132,11 @@ namespace Hooking {
 		return HandleStartingNewPlayerOriginal(Base, NewPlayer);
 	}
 
+	BYTE* ChangeGameSessionIdHook()
+	{
+		return nullptr;
+	}
+
 	void (*ProcessEvent0)(UObject* Obj, UFunction* UEFunction, void* Params);
 	void ProcessEvent_Hook(UObject* Obj, UFunction* UEFunction, void* Params)
 	{
