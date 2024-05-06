@@ -80,6 +80,9 @@ namespace Hooking {
 			GetGameState()->CurrentPlaylistInfo.MarkArrayDirty();
 			GetGameState()->OnRep_CurrentPlaylistInfo();
 
+			if (!GetGameState()->MapInfo)
+				return false;
+
 			static bool Listening = false;
 			if (!Listening)
 			{
