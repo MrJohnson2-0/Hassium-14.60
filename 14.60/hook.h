@@ -30,7 +30,11 @@ namespace Hooking {
 		return;
 	}
 
-	
+	void (*ServerReadyToStartMatchOriginal)(AFortPlayerController* PlayerController); //No UE Doc For This its literally AFortPlayerController;
+	void ServerReadyToStartMatchHook(AFortPlayerController* PlayerController)
+	{
+		return ServerReadyToStartMatchOriginal(PlayerController);
+	}
 
 	Enums::ENetMode GetNetMode() { // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/Engine/UWorld/GetNetMode/ UWorldGetNetMode
 		return Enums::ENetMode::NM_DedicatedServer;
@@ -100,6 +104,7 @@ namespace Hooking {
 				GetGameMode()->WarmupEarlyCountdownDuration = 150.0f;
 				GetGameState()->WarmupCountdownStartTime = 150.0f;
 				GetGameState()->WarmupCountdownEndTime = 150.0f;
+				GetGameMode()->bWorldIsReady = true; // Calls SpawnDefaultPawnFor????/
 				Listening = true;
 
 			}

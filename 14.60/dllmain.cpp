@@ -47,9 +47,6 @@ DWORD Main(LPVOID)
     
     Memory::VirtualHook(&AFortPlayerPawnAthena::GetDefaultObj()->Vft, 0x100, Hooking::ServerAcknowledgePossesion, nullptr);
 
-    //static auto HandleStartingNewPlayer = UObject::FindObject<UFunction>("/Script.Enigne.GameModeBase.HandleStartingNewPlayer");
-    //Memory::HookFunction(HandleStartingNewPlayer, Hooking::HandleStartingNewPlayer, (void**)&Hooking::HandleStartingNewPlayerOriginal);
-
     return 0;
 }
 
