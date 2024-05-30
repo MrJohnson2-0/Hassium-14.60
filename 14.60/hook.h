@@ -30,7 +30,7 @@ namespace Hooking {
 		return;
 	}
 
-	void (*ServerReadyToStartMatchOriginal)(AFortPlayerController* PlayerController); //No UE Doc For This its literally AFortPlayerController;
+	void (*ServerReadyToStartMatchOriginal)(AFortPlayerController* PlayerController); //No UE Doc For This its a /Script/FortniteGame.Function not a /Script/Engine.Function;
 	void ServerReadyToStartMatchHook(AFortPlayerController* PlayerController)
 	{
 		return ServerReadyToStartMatchOriginal(PlayerController);
@@ -43,6 +43,13 @@ namespace Hooking {
 	Enums::ENetMode GetNetModeActor() // https://docs.unrealengine.com/4.26/en-US/API/Runtime/Engine/GameFramework/AActor/GetNetMode/
 	{
 		return Enums::ENetMode::NM_DedicatedServer;
+	}
+
+	static __int64 (*DispatchRequestOriginal)(__int64 a1, __int64* a2, int a3);
+
+	static __int64 DispatchRequestHook(__int64 a1, __int64* a2, int a3)
+	{
+		return DispatchRequestOriginal(a1, a2, 3);
 	}
 
 	void (*TickFlushOriginal)(UNetDriver* NetDriver, float DeltaSeconds);
@@ -61,13 +68,16 @@ namespace Hooking {
 	bool(*ReadyToStartMatchOriginal)(AFortGameModeAthena* GameMode);
 	bool ReadyToStartMatchHook(AFortGameModeAthena* GameMode)
 	{
-		UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(GetWorld(), AFortPlayerStartWarmup::StaticClass(), &ActorsToFree); //Freeing PlayerStartActors
-		int Num = ActorsToFree.Num();
-		ActorsToFree.Free();
-		if (Num == 0) //No Actors Will need to be free! 
-		{
+		TArray<AActor*> WarmupActors;
+		UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(UWorld::GetWorld(), AFortPlayerStartWarmup::StaticClass(), &WarmupActors);
+
+		int WarmupSpots = WarmupActors.Num();
+
+		WarmupActors.Free();
+
+		if (WarmupSpots == 0)
 			return false;
-		}
+
 		static bool bReadyToStartMatchHook = false;
 		if (bReadyToStartMatchHook)
 			return false;
@@ -76,14 +86,40 @@ namespace Hooking {
 		if (!bInit)
 		{
 			bInit = true;
-			UFortPlaylistAthena* Playlist = UObject::FindObject<UFortPlaylistAthena>("FortPlaylistAthena /Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo");
+			UFortPlaylistAthena* Playlist = StaticFindObject<UFortPlaylistAthena>("/Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo");
+
+			GetGameMode()->WarmupRequiredPlayerCount = 1;
 			GetGameState()->CurrentPlaylistInfo.BasePlaylist = Playlist;
 			GetGameState()->CurrentPlaylistInfo.OverridePlaylist = Playlist;
 			GetGameState()->CurrentPlaylistInfo.PlaylistReplicationKey++;
 			GetGameState()->CurrentPlaylistInfo.MarkArrayDirty();
 			GetGameState()->OnRep_CurrentPlaylistInfo();
 
+
+
 			//Dont check for map info, very skunked, + I freed all the playerStartActors so theres no need for this
+
+			float TimeSeconds = UGameplayStatics::GetDefaultObj()->GetTimeSeconds(UWorld::GetWorld());
+			float Test = 99999.f;
+
+			GetGameMode()->WarmupRequiredPlayerCount = 1;
+			GetGameMode()->WarmupCountdownDuration = Test;
+			GetGameMode()->WarmupEarlyCountdownDuration = TimeSeconds;
+			GetGameState()->WarmupCountdownStartTime = TimeSeconds;
+			GetGameState()->WarmupCountdownEndTime = TimeSeconds + Test;
+
+			GetGameMode()->GameSession = SpawnActor2<AGameSession>({});
+			GetGameMode()->GameSession->MaxPlayers = 100;
+
+			GetGameState()->GameSessionId = L"ID";
+			GetGameState()->OnRep_GameSessionID();
+
+			GetGameState()->OnRep_CurrentPlaylistInfo();
+
+			GetGameMode()->WarmupRequiredPlayerCount = 1;
+
+			GetGameState()->AirCraftBehavior = Playlist->AirCraftBehavior;
+			GetGameMode()->bWorldIsReady = true; // Calls SpawnDefaultPawnFor????/
 
 			static bool Listening = false;
 			if (!Listening)
@@ -91,22 +127,10 @@ namespace Hooking {
 				Listening = true;
 				Listening::Listen();
 				//Dont need to spawn game session
-				GetGameMode()->GameSession->MaxPlayers = 100;
-				GetGameState()->GameSessionId = L"ID";
-				GetGameState()->OnRep_GameSessionID();
-				GetGameMode()->StartMatch();
-				GetGameMode()->StartPlay();
-				/*
-				EAthenaGamePhase Gamephase = GetGameState()->GamePhase;
-				GetGameState()->GamePhase = EAthenaGamePhase::Warmup; //Unnecessary for just ingame
-				GetGameState()->OnRep_GamePhase(Gamephase);
-				*/
-				GetGameMode()->WarmupRequiredPlayerCount = 1;
-				GetGameMode()->WarmupEarlyCountdownDuration = 150.0f;
-				GetGameState()->WarmupCountdownStartTime = 150.0f;
-				GetGameState()->WarmupCountdownEndTime = 150.0f;
-				GetGameMode()->bWorldIsReady = true; // Calls SpawnDefaultPawnFor????/
 				
+				GetGameMode()->WarmupRequiredPlayerCount = 1;
+				GetGameMode()->DefaultPawnClass = UObject::FindObject<UClass>("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
+				GetGameState()->DefaultParachuteDeployTraceForGroundDistance = 10000;
 			}
 
 		}

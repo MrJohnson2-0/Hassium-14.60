@@ -14,6 +14,17 @@ namespace Memory
 		return Offset;
 	}
 
+	void HookAddress(uintptr_t Address, LPVOID Detour, void** OG = nullptr)
+	{
+		MH_CreateHook((LPVOID)MergeOffset(Address), Detour, (void**)OG);
+		MH_EnableHook((LPVOID)MergeOffset(Address));
+	}
+
+	void Things()
+	{
+		
+
+	}
 	
 	void VirtualHook(void** VFT,int Index, void* Detour, void** OG = nullptr)
 	{
