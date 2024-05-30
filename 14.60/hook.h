@@ -71,7 +71,6 @@ namespace Hooking {
 		static bool bReadyToStartMatchHook = false;
 		if (bReadyToStartMatchHook)
 			return false;
-		std::cout << "ReadyToStartMatchCalled";
 		bReadyToStartMatchHook = true;
 		static bool bInit = false;
 		if (!bInit)
@@ -84,38 +83,51 @@ namespace Hooking {
 			GetGameState()->CurrentPlaylistInfo.MarkArrayDirty();
 			GetGameState()->OnRep_CurrentPlaylistInfo();
 
-			if (!GetGameState()->MapInfo)
-				return false;
+			//Dont check for map info, very skunked, + I freed all the playerStartActors so theres no need for this
 
 			static bool Listening = false;
 			if (!Listening)
 			{
+				Listening = true;
 				Listening::Listen();
-				GetGameMode()->GameSession = SpawnActor<AFortGameSession>({}, nullptr);
+				//Dont need to spawn game session
 				GetGameMode()->GameSession->MaxPlayers = 100;
 				GetGameState()->GameSessionId = L"ID";
 				GetGameState()->OnRep_GameSessionID();
 				GetGameMode()->StartMatch();
 				GetGameMode()->StartPlay();
+				/*
 				EAthenaGamePhase Gamephase = GetGameState()->GamePhase;
-				GetGameState()->GamePhase = EAthenaGamePhase::Warmup;
+				GetGameState()->GamePhase = EAthenaGamePhase::Warmup; //Unnecessary for just ingame
 				GetGameState()->OnRep_GamePhase(Gamephase);
+				*/
 				GetGameMode()->WarmupRequiredPlayerCount = 1;
 				GetGameMode()->WarmupEarlyCountdownDuration = 150.0f;
 				GetGameState()->WarmupCountdownStartTime = 150.0f;
 				GetGameState()->WarmupCountdownEndTime = 150.0f;
 				GetGameMode()->bWorldIsReady = true; // Calls SpawnDefaultPawnFor????/
-				Listening = true;
-
+				
 			}
 
 		}
-		return ReadyToStartMatchOriginal(GameMode);
+
+		bool Ret = false;
+
+		//Returning True is stripped on Chapter 2 and up+
+		if (GetGameState()->PlayersLeft >= GetGameMode()->WarmupRequiredPlayerCount)
+		{
+			Ret = true;
+		}
+		else
+		{
+			Ret = ReadyToStartMatchOriginal(GameMode);
+		}
+
+		return Ret;
 	}
 
 	APawn* SpawnDefaultPawnFor(AGameModeBase* GameMode, AController* NewPlayer, AActor* StartSpot)
 	{
-		std::cout << "SpawnDefaultPawnFor";
 		if (NewPlayer && StartSpot)
 		{
 			auto Transform = StartSpot->GetTransform();
@@ -150,52 +162,5 @@ namespace Hooking {
 	BYTE* ChangeGameSessionIdHook()
 	{
 		return nullptr;
-	}
-
-	void (*ProcessEvent0)(UObject* Obj, UFunction* UEFunction, void* Params);
-	void ProcessEvent_Hook(UObject* Obj, UFunction* UEFunction, void* Params)
-	{
-		std::string UEFuncName = UEFunction->GetName();
-		static bool bReadyToStartMatchHook = false;
-		if (UEFuncName == "ReadyToStartMatch" && !bReadyToStartMatchHook)
-		{
-			bReadyToStartMatchHook = true;
-			std::cout << "ReadyToStartMatchCalled!!!!!!!!!!!!!!!";
-			UFortPlaylistAthena* Playlist = UObject::FindObject<UFortPlaylistAthena>("Playlist_DefaultSolo.Playlist_DefaultSolo");
-			GetGameState()->CurrentPlaylistInfo.BasePlaylist = Playlist;
-			GetGameState()->CurrentPlaylistInfo.OverridePlaylist = Playlist;
-			GetGameState()->CurrentPlaylistId = Playlist->PlaylistId;
-			GetGameMode()->CurrentPlaylistName = Playlist->PlaylistName;
-			GetGameMode()->CurrentPlaylistId = Playlist->PlaylistId;
-			GetGameState()->OnRep_CurrentPlaylistInfo();
-			GetGameState()->OnRep_CurrentPlaylistId();
-		}
-
-		if (UEFuncName == "SpawnDefaultPawnFor")
-		{
-			AFortPlayerControllerAthena* PC = (AFortPlayerControllerAthena*)Obj;
-			TArray<AActor*> SpawnLocs;
-			if (bCreative)
-			{
-				UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(GetWorld(), AFortPlayerStartCreative::StaticClass(), &SpawnLocs);
-			}
-			else {
-				UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(GetWorld(), AFortPlayerStartWarmup::StaticClass(), &SpawnLocs);
-			}
-			
-			FVector SpawnLocationForPawn = SpawnLocs[(rand() % (size_t)SpawnLocs.Num())]->K2_GetActorLocation();
-			AFortPlayerPawnAthena* Pawn = SpawnActor<AFortPlayerPawnAthena>(SpawnLocationForPawn, nullptr);
-			PC->Possess(Pawn);
-		}
-
-		if (UEFuncName == "ServerAcknowledgePossesion")
-		{
-			auto InParams = (Params::APlayerController_ServerAcknowledgePossession_Params*)Params;
-			AFortPlayerPawnAthena* Pawn = (AFortPlayerPawnAthena*)Obj;
-			AFortPlayerControllerAthena* PC = (AFortPlayerControllerAthena*)Obj;
-			PC->AcknowledgedPawn = Pawn; //Sigma Behavior!!!!!!!
-		}
-
-		return ProcessEvent0(Obj, UEFunction, Params);
 	}
 }

@@ -35,8 +35,6 @@ namespace Listening
 				auto LevelCollections = GetWorld()->LevelCollections;
 				LevelCollections[i].NetDriver = NetDriver;
 			}
-
-
 		}
 	}
 }
