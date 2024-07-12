@@ -103,7 +103,7 @@ namespace Hooking {
 			//Dont check for map info, very skunked, + I freed all the playerStartActors so theres no need for this
 
 			GetGameMode()->GameSession = SpawnActor2<AFortGameSessionDedicatedAthena>({});
-			GetGameMode()->GameSession->MaxPlayers = 100
+			GetGameMode()->GameSession->MaxPlayers = 100;
 
 			static bool Listening = false;
 			if (!Listening)
