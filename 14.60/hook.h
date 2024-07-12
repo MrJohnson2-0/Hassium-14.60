@@ -123,6 +123,22 @@ namespace Hooking {
 		return false;
 	}
 
+	void (*HandleStartingNewPlayerOG)(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC);
+	void HandleStartingNewPlayerHook(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC)
+	{
+		LOG("HandleStartingNewPlayer");
+		FGameMemberInfo PlayerInfo = FGameMemberInfo();
+		PlayerInfo.MemberUniqueId = PC->PlayerState->UniqueId;
+		PlayerInfo.ReplicationID = -1;
+		PlayerInfo.ReplicationKey = -1;
+		PlayerInfo.MostRecentArrayReplicationKey = -1;
+
+		GetGameState()->GameMemberInfoArray.Members.Add(PlayerInfo);
+		GetGameState()->GameMemberInfoArray.MarkArrayDirty();
+
+		return HandleStartingNewPlayerOG(GM, PC);
+	}
+
 	APawn* SpawnDefaultPawnFor(AGameModeBase* GameMode, AController* NewPlayer, AActor* StartSpot)
 	{
 		if (NewPlayer && StartSpot)
