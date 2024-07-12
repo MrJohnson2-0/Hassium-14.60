@@ -20,6 +20,7 @@ namespace Listening
 		UNetDriver* NetDriver = CreateNetDriver(GetEngine(), GetWorld(), NetDriverDefinition);
 		if (NetDriver)
 		{
+			GetWorld()->NetDriver = NetDriver; //I am actually sped for this
 			NetDriver->NetDriverName = NetDriverDefinition;
 			NetDriver->World = GetWorld();
 			FString Error;
@@ -28,9 +29,8 @@ namespace Listening
 
 			InitListen(NetDriver, GetWorld(), url, false, Error);
 			SetWorld(NetDriver, GetWorld());
-			GetWorld()->NetDriver = NetDriver;
 			int LevelCollectionsNum = GetWorld()->LevelCollections.Num();
-			for (int i = 0; i < LevelCollectionsNum; i++)
+			for (int i = 0; i < LevelCollectionsNum; i++) // could change this to a for auto loop but eh cant be arsed
 			{
 				auto LevelCollections = GetWorld()->LevelCollections;
 				LevelCollections[i].NetDriver = NetDriver;
