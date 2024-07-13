@@ -23,29 +23,29 @@ DWORD Main(LPVOID)
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::KickPlayer), Hooking::Patch3, nullptr);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::KickPlayer));
 
-    MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ActorGetNetMode), Hooking::GetNetModeActor, nullptr);
-    MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ActorGetNetMode));
+    *(bool*)(Memory::MergeOffset(0x939a30d)) = false; //GIsClient, no need for actornetmode with gIsClient
 
-    Memory::HookAddress(0x26dc980, Hooking::Patch2);
+    //Memory::HookAddress(0x26dc980, Hooking::Patch2); I don't know what this is
 
-    Memory::HookAddress(0x144cb00, Hooking::DispatchRequestHook, (void**)&Hooking::DispatchRequestOriginal);
-
-    *(bool*)(Memory::MergeOffset(0x939a30d)) = false;
+    //Memory::HookAddress(0x144cb00, Hooking::DispatchRequestHook, (void**)&Hooking::DispatchRequestOriginal); I'm trying to go in game not get mcp first try.
 
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::CollectGarbage), Hooking::Patch4, nullptr);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::CollectGarbage));
 
-    UFortEngine::GetEngine()->GameInstance->LocalPlayers.Remove(0);
+
     UKismetSystemLibrary::GetDefaultObj()->ExecuteConsoleCommand(UWorld::GetWorld(), L"open Apollo_Terrain", nullptr);
+    UFortEngine::GetEngine()->GameInstance->LocalPlayers.Remove(0); //Tbh not quite sure why I decided to remove the player before loading the level, I am very smart I swear.
     
-    MH_CreateHook((LPVOID)Memory::MergeOffset(0x2653520), Hooking::ChangeGameSessionIdHook, nullptr);
-    MH_EnableHook((LPVOID)Memory::MergeOffset(0x2653520)); 
+    //MH_CreateHook((LPVOID)Memory::MergeOffset(0x2653520), Hooking::ChangeGameSessionIdHook, nullptr);
+    //MH_EnableHook((LPVOID)Memory::MergeOffset(0x2653520)); 
 
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch), Hooking::ReadyToStartMatchHook, (void**)&Hooking::ReadyToStartMatchOriginal);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch));
 
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor), Hooking::SpawnDefaultPawnFor, nullptr);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor));
+
+    Memory::VirtualHook(AFortGameModeAthena::GetDefaultObj()->Vft, 0xCF, Hooking::HandleStartingNewPlayerHook, (void**)&Hooking::HandleStartingNewPlayerOG);
 
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::TickFlush), Hooking::TickFlushHook, (void**)&Hooking::TickFlushOriginal);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::TickFlush));

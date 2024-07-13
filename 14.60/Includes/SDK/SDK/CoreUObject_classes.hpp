@@ -15,7 +15,7 @@ class UObject
 {
 public:
 	static class TUObjectArray*                  GObjects;                                          // (0x00[0x00]) NOT AUTO-GENERATED PROPERTY
-	void*                                        Vft;                                               // (0x00[0x08]) NOT AUTO-GENERATED PROPERTY
+	void**                                        Vft;                                               // (0x00[0x08]) NOT AUTO-GENERATED PROPERTY
 	int32                                        Flags;                                             // (0x08[0x04]) NOT AUTO-GENERATED PROPERTY
 	int32                                        Index;                                             // (0x0C[0x04]) NOT AUTO-GENERATED PROPERTY
 	class UClass*                                Class;                                             // (0x10[0x08]) NOT AUTO-GENERATED PROPERTY

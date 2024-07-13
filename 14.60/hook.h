@@ -87,7 +87,10 @@ namespace Hooking {
 		{
 			bInit = true;
 			UFortPlaylistAthena* Playlist = StaticFindObject<UFortPlaylistAthena>("/Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo");
-
+			if (!Playlist)
+			{
+				return false;
+			}
 			GetGameMode()->WarmupRequiredPlayerCount = 1;
 			GetGameState()->CurrentPlaylistInfo.BasePlaylist = Playlist;
 			GetGameState()->CurrentPlaylistInfo.OverridePlaylist = Playlist;
@@ -99,55 +102,42 @@ namespace Hooking {
 
 			//Dont check for map info, very skunked, + I freed all the playerStartActors so theres no need for this
 
-			float TimeSeconds = UGameplayStatics::GetDefaultObj()->GetTimeSeconds(UWorld::GetWorld());
-			float Test = 99999.f;
-
-			GetGameMode()->WarmupRequiredPlayerCount = 1;
-			GetGameMode()->WarmupCountdownDuration = Test;
-			GetGameMode()->WarmupEarlyCountdownDuration = TimeSeconds;
-			GetGameState()->WarmupCountdownStartTime = TimeSeconds;
-			GetGameState()->WarmupCountdownEndTime = TimeSeconds + Test;
-
-			GetGameMode()->GameSession = SpawnActor2<AGameSession>({});
+			GetGameMode()->GameSession = SpawnActor2<AFortGameSessionDedicatedAthena>({});
 			GetGameMode()->GameSession->MaxPlayers = 100;
-
-			GetGameState()->GameSessionId = L"ID";
-			GetGameState()->OnRep_GameSessionID();
-
-			GetGameState()->OnRep_CurrentPlaylistInfo();
-
-			GetGameMode()->WarmupRequiredPlayerCount = 1;
-
-			GetGameState()->AirCraftBehavior = Playlist->AirCraftBehavior;
-			GetGameMode()->bWorldIsReady = true; // Calls SpawnDefaultPawnFor????/
 
 			static bool Listening = false;
 			if (!Listening)
 			{
 				Listening = true;
 				Listening::Listen();
-				//Dont need to spawn game session
 				
 				GetGameMode()->WarmupRequiredPlayerCount = 1;
-				GetGameMode()->DefaultPawnClass = UObject::FindObject<UClass>("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
-				GetGameState()->DefaultParachuteDeployTraceForGroundDistance = 10000;
+				//Why just why GetGameMode()->DefaultPawnClass = UObject::FindObject<UClass>("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
+				GetGameMode()->bWorldIsReady = true;
 			}
 
 		}
 
-		bool Ret = false;
+		if (GetGameMode()->AlivePlayers.Num() >= 1) return true;
+		LOG("Returning False: bReadyToStartMatch");
+		return false;
+	}
 
-		//Returning True is stripped on Chapter 2 and up+
-		if (GetGameState()->PlayersLeft >= GetGameMode()->WarmupRequiredPlayerCount)
-		{
-			Ret = true;
-		}
-		else
-		{
-			Ret = ReadyToStartMatchOriginal(GameMode);
-		}
+	void (*HandleStartingNewPlayerOG)(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC);
+	void HandleStartingNewPlayerHook(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC)
+	{
+		LOG("HandleStartingNewPlayer");
+		FGameMemberInfo PlayerInfo = FGameMemberInfo();
+		PlayerInfo.SquadId = ((AFortPlayerStateAthena*)PC->PlayerState)->SquadId;
+		PlayerInfo.MemberUniqueId = PC->PlayerState->UniqueId;
+		PlayerInfo.ReplicationID = -1;
+		PlayerInfo.ReplicationKey = -1;
+		PlayerInfo.MostRecentArrayReplicationKey = -1;
 
-		return Ret;
+		GetGameState()->GameMemberInfoArray.Members.Add(PlayerInfo);
+		GetGameState()->GameMemberInfoArray.MarkArrayDirty();
+
+		return HandleStartingNewPlayerOG(GM, PC);
 	}
 
 	APawn* SpawnDefaultPawnFor(AGameModeBase* GameMode, AController* NewPlayer, AActor* StartSpot)
@@ -160,31 +150,5 @@ namespace Hooking {
 		}
 
 		return 0;
-	}
-
-	void ServerAcknowledgePossesion(APlayerController* Controller, APawn* P) 
-	{
-		std::cout << "ServerAcknowledgePossesion";
-		Controller->AcknowledgedPawn = P;
-	}
-
-	void (*HandleStartingNewPlayerOriginal)(AGameModeBase* Base, AFortPlayerControllerAthena* NewPlayer);
-	void HandleStartingNewPlayer(AGameModeBase* Base, AFortPlayerControllerAthena* NewPlayer)
-	{
-		std::cout << "Join!!!!!!";
-
-		auto PS = reinterpret_cast<AFortPlayerStateAthena*>(NewPlayer->PlayerState);
-		NewPlayer->bHasServerFinishedLoading = true;
-		NewPlayer->OnRep_bHasServerFinishedLoading();
-
-		PS->bHasStartedPlaying = true;
-		PS->OnRep_bHasStartedPlaying();
-
-		return HandleStartingNewPlayerOriginal(Base, NewPlayer);
-	}
-
-	BYTE* ChangeGameSessionIdHook()
-	{
-		return nullptr;
 	}
 }
