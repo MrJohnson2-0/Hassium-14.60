@@ -37,7 +37,9 @@ DWORD Main(LPVOID)
     UFortEngine::GetEngine()->GameInstance->LocalPlayers.Remove(0); //Tbh not quite sure why I decided to remove the player before loading the level, I am very smart I swear.
     
     //MH_CreateHook((LPVOID)Memory::MergeOffset(0x2653520), Hooking::ChangeGameSessionIdHook, nullptr);
-    //MH_EnableHook((LPVOID)Memory::MergeOffset(0x2653520)); 
+    //MH_EnableHook((LPVOID)Memory::MergeOffset(0x2653520));
+
+    Memory::HookAddress(Memory::MergeOffset(0x2066c40), Hooking::PickTeamHook);
 
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch), Hooking::ReadyToStartMatchHook, (void**)&Hooking::ReadyToStartMatchOriginal);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::ReadyToStartMatch));

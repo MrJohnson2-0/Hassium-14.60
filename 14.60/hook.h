@@ -122,17 +122,34 @@ namespace Hooking {
 		LOG("Returning False: bReadyToStartMatch");
 		return false;
 	}
+        static uint8 NextTeam = 3; //Dont change or bad sigma
+	static uint8 LastPlayers = 0;
+	EFortTeam PickTeamHook(AFortGameModeAthena* GM, uint8 Preffered, AFortPlayerControllerAthena* PC)
+	{
+		uint8 Return = 3;
+		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
+		LastPlayers++;
+		if (LastPlayers >= GameState->CurrentPlaylistInfo.BasePlaylist->MaxSquadSize)
+		{
+			NextTeam++;
+			LastPlayers = 0;
+		}
 
+		return EFortTeam(Return);
+	}
 	void (*HandleStartingNewPlayerOG)(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC);
 	void HandleStartingNewPlayerHook(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC)
 	{
-		LOG("HandleStartingNewPlayer");
+		((AFortPlayerStateAthena*)PC->PlayerState)->SquadId = ((AFortPlayerStateAthena*)PC->PlayerState)->TeamIndex - 3;
+		((AFortPlayerStateAthena*)PC->PlayerState)->OnRep_SquadId();
+		
 		FGameMemberInfo PlayerInfo = FGameMemberInfo();
-		PlayerInfo.SquadId = ((AFortPlayerStateAthena*)PC->PlayerState)->SquadId;
-		PlayerInfo.MemberUniqueId = PC->PlayerState->UniqueId;
 		PlayerInfo.ReplicationID = -1;
 		PlayerInfo.ReplicationKey = -1;
 		PlayerInfo.MostRecentArrayReplicationKey = -1;
+		PlayerInfo.TeamIndex = ((AFortPlayerStateAthena*)PC->PlayerState)->TeamIndex;
+		PlayerInfo.SquadId = ((AFortPlayerStateAthena*)PC->PlayerState)->SquadId;
+		PlayerInfo.MemberUniqueId = PC->PlayerState->UniqueId;
 
 		GetGameState()->GameMemberInfoArray.Members.Add(PlayerInfo);
 		GetGameState()->GameMemberInfoArray.MarkArrayDirty();
