@@ -45,6 +45,8 @@ DWORD Main(LPVOID)
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor), Hooking::SpawnDefaultPawnFor, nullptr);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::SpawnDefaultPawnFor));
 
+    Memory::VirtualHook(AFortGameModeAthena::GetDefaultObj()->Vft, 0xCF, Hooking::HandleStartingNewPlayerHook, (void**)&Hooking::HandleStartingNewPlayerOG);
+
     MH_CreateHook((LPVOID)Memory::MergeOffset(Offsets::TickFlush), Hooking::TickFlushHook, (void**)&Hooking::TickFlushOriginal);
     MH_EnableHook((LPVOID)Memory::MergeOffset(Offsets::TickFlush));
 
