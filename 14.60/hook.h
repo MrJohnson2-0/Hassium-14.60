@@ -122,7 +122,21 @@ namespace Hooking {
 		LOG("Returning False: bReadyToStartMatch");
 		return false;
 	}
+        static uint8 NextTeam = 3; //Dont change or bad sigma
+	static uint8 LastPlayers = 0;
+	EFortTeam PickTeamHook(AFortGameModeAthena* GM, uint8 Preffered, AFortPlayerControllerAthena* PC)
+	{
+		uint8 Return = 3;
+		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
+		LastPlayers++;
+		if (LastPlayers >= GameState->CurrentPlaylistInfo.BasePlaylist->MaxSquadSize)
+		{
+			NextTeam++;
+			LastPlayers = 0;
+		}
 
+		return EFortTeam(Return);
+	}
 	void (*HandleStartingNewPlayerOG)(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC);
 	void HandleStartingNewPlayerHook(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC)
 	{
