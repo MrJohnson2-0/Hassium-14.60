@@ -128,6 +128,7 @@ namespace Hooking {
 	{
 		LOG("HandleStartingNewPlayer");
 		FGameMemberInfo PlayerInfo = FGameMemberInfo();
+		PlayerInfo.SquadId = ((AFortPlayerStateAthena*)PC->PlayerState)->SquadId;
 		PlayerInfo.MemberUniqueId = PC->PlayerState->UniqueId;
 		PlayerInfo.ReplicationID = -1;
 		PlayerInfo.ReplicationKey = -1;
