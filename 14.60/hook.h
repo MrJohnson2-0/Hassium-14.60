@@ -140,13 +140,16 @@ namespace Hooking {
 	void (*HandleStartingNewPlayerOG)(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC);
 	void HandleStartingNewPlayerHook(AFortGameModeAthena* GM, AFortPlayerControllerAthena* PC)
 	{
-		LOG("HandleStartingNewPlayer");
+		((AFortPlayerStateAthena*)PC->PlayerState)->SquadId = ((AFortPlayerStateAthena*)PC->PlayerState)->TeamIndex - 3;
+		((AFortPlayerStateAthena*)PC->PlayerState)->OnRep_SquadId();
+		
 		FGameMemberInfo PlayerInfo = FGameMemberInfo();
-		PlayerInfo.SquadId = ((AFortPlayerStateAthena*)PC->PlayerState)->SquadId;
-		PlayerInfo.MemberUniqueId = PC->PlayerState->UniqueId;
 		PlayerInfo.ReplicationID = -1;
 		PlayerInfo.ReplicationKey = -1;
 		PlayerInfo.MostRecentArrayReplicationKey = -1;
+		PlayerInfo.TeamIndex = ((AFortPlayerStateAthena*)PC->PlayerState)->TeamIndex;
+		PlayerInfo.SquadId = ((AFortPlayerStateAthena*)PC->PlayerState)->SquadId;
+		PlayerInfo.MemberUniqueId = PC->PlayerState->UniqueId;
 
 		GetGameState()->GameMemberInfoArray.Members.Add(PlayerInfo);
 		GetGameState()->GameMemberInfoArray.MarkArrayDirty();
